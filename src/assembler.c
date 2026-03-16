@@ -147,9 +147,21 @@ int assemble(const char **lines, size_t line_count,
                 return -1;
             }
 
-            word = encode_i(desc->opcode, (uint32_t)rd,
-                            desc->funct3, (uint32_t)rs1,
-                            imm);
+            /* Handle shift-immediate instructions where funct7 is part of imm[11:5] */
+            if (strcmp(desc->name, "slli") == 0 ||
+                strcmp(desc->name, "srli") == 0 ||
+                strcmp(desc->name, "srai") == 0) {
+                uint32_t shamt = (uint32_t)imm & 0x1Fu;               /* imm[4:0] */
+                uint32_t full_imm = ((desc->funct7 & 0x7Fu) << 5)     /* imm[11:5] */
+                                   | shamt;
+                word = encode_i(desc->opcode, (uint32_t)rd,
+                                desc->funct3, (uint32_t)rs1,
+                                (int32_t)full_imm);
+            } else {
+                word = encode_i(desc->opcode, (uint32_t)rd,
+                                desc->funct3, (uint32_t)rs1,
+                                imm);
+            }
         } else if (desc->fmt == FMT_S) {
             /* store: rs2, imm(rs1) */
             int rs1, rs2;
@@ -220,9 +232,9 @@ int assemble(const char **lines, size_t line_count,
             if (rd < 0) {
                 return -1;
             }
-            uint32_t uimm = (uint32_t)imm;
+            uint32_t uimm = (uint32_t)imm & 0xFFFFFu;  /* 20-bit immediate */
             uint32_t inst = 0;
-            inst |= (uimm & 0xFFFFF000u);      /* imm[31:12] */
+            inst |= (uimm << 12);                     /* imm[31:12] */
             inst |= ((uint32_t)rd & 0x1Fu) << 7;
             inst |= (desc->opcode & 0x7Fu);
             word = inst;
