@@ -1,0 +1,70 @@
+#include "instr_table.h"
+
+/* Base RV32I instruction encodings.
+ * The metadata values are taken from the standard RISC-V reference card.
+ *
+ * Example entry:
+ *   { "add", FMT_R, 0x33, 0x0, 0x00 }
+ */
+
+const instr_desc_t instr_table[] = {
+    /* R-type arithmetic / logical */
+    { "add",   FMT_R, 0x33, 0x0, 0x00 },
+    { "sub",   FMT_R, 0x33, 0x0, 0x20 },
+    { "sll",   FMT_R, 0x33, 0x1, 0x00 },
+    { "slt",   FMT_R, 0x33, 0x2, 0x00 },
+    { "sltu",  FMT_R, 0x33, 0x3, 0x00 },
+    { "xor",   FMT_R, 0x33, 0x4, 0x00 },
+    { "srl",   FMT_R, 0x33, 0x5, 0x00 },
+    { "sra",   FMT_R, 0x33, 0x5, 0x20 },
+    { "or",    FMT_R, 0x33, 0x6, 0x00 },
+    { "and",   FMT_R, 0x33, 0x7, 0x00 },
+
+    /* I-type immediate arithmetic / logical */
+    { "addi",  FMT_I, 0x13, 0x0, 0x00 },
+    { "slti",  FMT_I, 0x13, 0x2, 0x00 },
+    { "sltiu", FMT_I, 0x13, 0x3, 0x00 },
+    { "xori",  FMT_I, 0x13, 0x4, 0x00 },
+    { "ori",   FMT_I, 0x13, 0x6, 0x00 },
+    { "andi",  FMT_I, 0x13, 0x7, 0x00 },
+
+    /* Shift-immediate (I-type, using funct7 field) */
+    { "slli",  FMT_I, 0x13, 0x1, 0x00 },
+    { "srli",  FMT_I, 0x13, 0x5, 0x00 },
+    { "srai",  FMT_I, 0x13, 0x5, 0x20 },
+
+    /* Loads (I-type, opcode 0000011) */
+    { "lb",    FMT_I, 0x03, 0x0, 0x00 },
+    { "lh",    FMT_I, 0x03, 0x1, 0x00 },
+    { "lw",    FMT_I, 0x03, 0x2, 0x00 },
+    { "lbu",   FMT_I, 0x03, 0x4, 0x00 },
+    { "lhu",   FMT_I, 0x03, 0x5, 0x00 },
+
+    /* Stores (S-type, opcode 0100011) */
+    { "sb",    FMT_S, 0x23, 0x0, 0x00 },
+    { "sh",    FMT_S, 0x23, 0x1, 0x00 },
+    { "sw",    FMT_S, 0x23, 0x2, 0x00 },
+
+    /* Branches (B-type, opcode 1100011) */
+    { "beq",   FMT_B, 0x63, 0x0, 0x00 },
+    { "bne",   FMT_B, 0x63, 0x1, 0x00 },
+    { "blt",   FMT_B, 0x63, 0x4, 0x00 },
+    { "bge",   FMT_B, 0x63, 0x5, 0x00 },
+    { "bltu",  FMT_B, 0x63, 0x6, 0x00 },
+    { "bgeu",  FMT_B, 0x63, 0x7, 0x00 },
+
+    /* Jumps and links */
+    { "jal",   FMT_J, 0x6F, 0x0, 0x00 },
+    { "jalr",  FMT_I, 0x67, 0x0, 0x00 },
+
+    /* Upper immediates */
+    { "lui",   FMT_U, 0x37, 0x0, 0x00 },
+    { "auipc", FMT_U, 0x17, 0x0, 0x00 },
+
+    /* System (treated as I-type for encoding purposes) */
+    { "ecall",  FMT_I, 0x73, 0x0, 0x00 },
+    { "ebreak", FMT_I, 0x73, 0x0, 0x00 },
+};
+
+const unsigned int instr_table_size = sizeof(instr_table) / sizeof(instr_table[0]);
+
